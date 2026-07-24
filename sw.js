@@ -1,8 +1,8 @@
-/* Bench Rate - offline cache.
+/* Exchange Spot - offline cache.
    Bump CACHE_NAME whenever you upload a changed index.html,
-   e.g. "benchrate-v2", so phones pick up the new version. */
+   e.g. "exchangespot-v2", so phones pick up the new version. */
 
-const CACHE_NAME = "benchrate-v1";
+const CACHE_NAME = "exchangespot-v1";
 
 const SHELL = [
   "./",

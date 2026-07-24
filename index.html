@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#B8E4DC">
-<title>Bench Rate</title>
+<title>Exchange Spot</title>
 <link rel="manifest" href="./manifest.json">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="./icon.svg">
@@ -103,23 +103,15 @@ label.field{display:block;margin-bottom:18px}
 .fxbox .sym{font-size:12px;color:var(--muted);letter-spacing:.06em}
 .fxbox input{
   border:0;border-radius:0;background:transparent;
-  font-size:24px;font-weight:500;padding:15px 14px;letter-spacing:.01em;
+  font-size:24px;font-weight:500;padding:17px 14px;letter-spacing:.01em;
 }
 .fxbox input:focus{outline:none}
-.fxbox .rate{
-  grid-column:2;font-size:12px;color:var(--muted);letter-spacing:.09em;
-  padding:0 14px 10px;margin-top:-8px;text-transform:uppercase;
-}
 /* read-only variant for the metal tab */
 .fxbox .val{
-  font-size:24px;font-weight:500;padding:15px 14px;letter-spacing:.01em;
+  font-size:24px;font-weight:500;padding:17px 14px;letter-spacing:.01em;
   color:var(--accent);
 }
 .fxbox .val.lead{font-weight:600}
-.fxbox .sub{
-  grid-column:2;font-size:12px;color:var(--muted);letter-spacing:.09em;
-  padding:0 14px 11px;margin-top:-9px;text-transform:uppercase;
-}
 
 .note{
   font-size:15px;color:var(--ink-soft);line-height:1.65;margin-top:20px;
@@ -151,7 +143,7 @@ button.act:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 <header>
   <div class="mast">
-    <h1>Bench <em>Rate</em></h1>
+    <h1>Exchange <em>Spot</em></h1>
     <div class="stamp" id="stamp">Rates as of<b>&mdash;</b></div>
   </div>
 </header>
@@ -229,8 +221,7 @@ let lastEdited = "GBP";
 
 /* ---------- helpers ---------- */
 const $ = id => document.getElementById(id);
-const money = (n, dp) => n.toLocaleString("en-ZA",{minimumFractionDigits:dp,maximumFractionDigits:dp});
-const dpFor = v => (Math.abs(v) < 10 && v !== 0) ? 4 : 2;
+const money = n => n.toLocaleString("en-GB",{minimumFractionDigits:2,maximumFractionDigits:2});
 
 function showError(msg){ const e=$("err"); e.textContent=msg; e.classList.add("on"); }
 function clearError(){ $("err").classList.remove("on"); }
@@ -242,7 +233,6 @@ function buildStack(){
       <div class="tag"><div class="code">${c}</div><div class="sym">${SYM[c]}</div></div>
       <input type="number" id="fx_${c}" inputmode="decimal" step="any"
              aria-label="Amount in ${c}" autocomplete="off">
-      <div class="rate" id="rate_${c}"></div>
     </div>`).join("");
 
   CURRENCIES.forEach(c => {
@@ -258,10 +248,9 @@ function spread(from){
 
   CURRENCIES.forEach(c => {
     const unit = zarPer[from] / zarPer[c];
-    $("rate_"+c).textContent = (c === from) ? "" : `1 ${from} = ${SYM[c]}${unit.toFixed(4)}`;
     if(c === from) return;
     const v = amt * unit;
-    $("fx_"+c).value = isNaN(v) ? "" : v.toFixed(dpFor(v));
+    $("fx_"+c).value = isNaN(v) ? "" : v.toFixed(2);
   });
 }
 
@@ -291,8 +280,7 @@ function renderMetals(){
     const total   = hasWeight ? perGram * g : perGram;
     return `<div class="fxbox">
         <div class="tag"><div class="code">${c}</div><div class="sym">${SYM[c]}</div></div>
-        <div class="val${i === 0 ? " lead" : ""}">${SYM[c]}${money(total, dpFor(total))}</div>
-        <div class="sub">${hasWeight ? `${SYM[c]}${money(perGram, dpFor(perGram))} per gram` : `${a.mark} · per gram`}</div>
+        <div class="val${i === 0 ? " lead" : ""}">${SYM[c]}${money(total)}</div>
       </div>`;
   }).join("");
 }
@@ -331,7 +319,7 @@ async function fetchRates(){
       at: new Date().toISOString()
     };
 
-    localStorage.setItem("benchrate", JSON.stringify(data));
+    localStorage.setItem("exchangespot", JSON.stringify(data));
     render();
   }catch(err){
     showError(navigator.onLine
@@ -351,7 +339,7 @@ function render(){
   const st = $("stamp");
   st.classList.toggle("stale", ageHrs > 24);
   st.innerHTML = "Rates as of<b>" +
-    d.toLocaleString("en-ZA",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit",hour12:false}) +
+    d.toLocaleString("en-GB",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit",hour12:false}) +
     "</b>";
   spread(lastEdited);
   renderMetals();
@@ -381,7 +369,7 @@ if("serviceWorker" in navigator){
 }
 
 /* ---------- start: use saved rates, never fetch on its own ---------- */
-const cached = localStorage.getItem("benchrate");
+const cached = localStorage.getItem("exchangespot") || localStorage.getItem("benchrate");
 if(cached){
   try{ data = JSON.parse(cached); render(); }catch(e){}
 }

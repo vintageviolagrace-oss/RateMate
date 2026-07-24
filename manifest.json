@@ -1,6 +1,6 @@
 {
-  "name": "Bench Rate",
-  "short_name": "Bench Rate",
+  "name": "Exchange Spot",
+  "short_name": "Exchange Spot",
   "description": "Currency and precious metal spot values for the trade.",
   "start_url": "./index.html",
   "scope": "./",
