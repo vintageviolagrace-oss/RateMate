@@ -1,0 +1,14 @@
+{
+  "name": "Bench Rate",
+  "short_name": "Bench Rate",
+  "description": "Currency and precious metal spot values for the trade.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#B8E4DC",
+  "theme_color": "#B8E4DC",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

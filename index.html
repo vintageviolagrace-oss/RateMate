@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#B8E4DC">
+<title>Bench Rate</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon.svg">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   PASTE YOUR TWO KEYS IN THE SCRIPT AT THE BOTTOM OF THIS FILE
+   ============================================================ */
+
+:root{
+  --tiffany:#B8E4DC;
+  --tiffany-2:#A5DCD2;
+  --card:#CFEDE7;
+  --card-2:#C3E8E1;
+  --rule:#8FC7BD;
+  --ink:#4A5556;
+  --ink-soft:#6E7B7C;
+  --muted:#89999A;
+  --accent:#3D4A4B;
+  --alert:#9C5A4A;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--tiffany);color:var(--ink)}
+body{
+  font-family:'Cormorant Garamond',Garamond,Georgia,serif;
+  min-height:100vh;
+  padding:0 0 env(safe-area-inset-bottom);
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:520px;margin:0 auto;padding:0 18px}
+
+/* ---------- masthead ---------- */
+header{padding:calc(26px + env(safe-area-inset-top)) 0 16px}
+.mast{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+h1{
+  font-weight:400;font-size:29px;letter-spacing:.20em;
+  text-transform:uppercase;color:var(--accent);line-height:1.1;
+}
+h1 em{font-style:normal;font-weight:600}
+.stamp{
+  font-size:12px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--muted);text-align:right;line-height:1.5;flex-shrink:0;
+}
+.stamp b{display:block;color:var(--ink-soft);font-weight:500}
+.stamp.stale b{color:var(--alert)}
+
+/* ---------- tabs ---------- */
+nav{display:flex;margin:20px 0 24px;border-bottom:1px solid var(--rule)}
+nav button{
+  flex:1;background:none;border:0;color:var(--muted);
+  font-family:inherit;font-size:15px;font-weight:500;
+  letter-spacing:.16em;text-transform:uppercase;
+  padding:12px 4px;cursor:pointer;
+  border-bottom:1px solid transparent;margin-bottom:-1px;
+  transition:color .2s;
+}
+nav button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+nav button:focus-visible{outline:1px solid var(--accent);outline-offset:-2px}
+
+/* ---------- shared ---------- */
+.panel[hidden]{display:none}
+.lbl{
+  font-size:12px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--muted);display:block;margin-bottom:8px;
+}
+input[type=number],select{
+  width:100%;background:#DCF2EE;border:1px solid var(--rule);
+  border-radius:2px;color:var(--accent);padding:13px 14px;
+  font-family:inherit;font-size:21px;font-weight:500;letter-spacing:.02em;
+}
+input[type=number]:focus,select:focus{outline:none;border-color:var(--accent)}
+input[type=number]{-moz-appearance:textfield}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none}
+select{appearance:none;padding-right:34px;background-image:linear-gradient(45deg,transparent 50%,var(--ink-soft) 50%),linear-gradient(135deg,var(--ink-soft) 50%,transparent 50%);background-position:calc(100% - 18px) 23px,calc(100% - 13px) 23px;background-size:5px 5px;background-repeat:no-repeat}
+label.field{display:block;margin-bottom:18px}
+.row{display:grid;grid-template-columns:1fr 1.25fr;gap:11px}
+
+/* ---------- stacked value boxes (used by both tabs) ---------- */
+.stack{display:flex;flex-direction:column;gap:10px}
+.fxbox{
+  display:grid;grid-template-columns:76px 1fr;align-items:center;
+  background:var(--card);border:1px solid var(--rule);border-radius:2px;
+  overflow:hidden;transition:border-color .2s;
+}
+.fxbox:focus-within{border-color:var(--accent)}
+.fxbox .tag{
+  padding:0 12px;border-right:1px solid var(--rule);align-self:stretch;
+  display:flex;flex-direction:column;justify-content:center;gap:1px;
+  background:var(--card-2);
+}
+.fxbox .code{font-size:15px;letter-spacing:.15em;color:var(--accent);font-weight:600}
+.fxbox .sym{font-size:12px;color:var(--muted);letter-spacing:.06em}
+.fxbox input{
+  border:0;border-radius:0;background:transparent;
+  font-size:24px;font-weight:500;padding:15px 14px;letter-spacing:.01em;
+}
+.fxbox input:focus{outline:none}
+.fxbox .rate{
+  grid-column:2;font-size:12px;color:var(--muted);letter-spacing:.09em;
+  padding:0 14px 10px;margin-top:-8px;text-transform:uppercase;
+}
+/* read-only variant for the metal tab */
+.fxbox .val{
+  font-size:24px;font-weight:500;padding:15px 14px;letter-spacing:.01em;
+  color:var(--accent);
+}
+.fxbox .val.lead{font-weight:600}
+.fxbox .sub{
+  grid-column:2;font-size:12px;color:var(--muted);letter-spacing:.09em;
+  padding:0 14px 11px;margin-top:-9px;text-transform:uppercase;
+}
+
+.note{
+  font-size:15px;color:var(--ink-soft);line-height:1.65;margin-top:20px;
+  padding-top:15px;border-top:1px solid var(--rule);
+}
+.note strong{color:var(--accent);font-weight:600}
+
+/* ---------- refresh ---------- */
+.bar{display:flex;margin:26px 0 34px}
+button.act{
+  flex:1;background:var(--accent);color:var(--tiffany);border:0;border-radius:2px;
+  padding:15px;font-family:inherit;font-size:15px;font-weight:600;
+  letter-spacing:.18em;text-transform:uppercase;cursor:pointer;
+}
+button.act:active{opacity:.82}
+button.act:disabled{opacity:.5}
+button.act:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.msg{
+  font-size:15px;line-height:1.6;padding:13px 15px;border-radius:2px;
+  margin-bottom:16px;display:none;
+}
+.msg.on{display:block}
+.msg.err{background:rgba(156,90,74,.12);border:1px solid rgba(156,90,74,.4);color:#7E4638}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="mast">
+    <h1>Bench <em>Rate</em></h1>
+    <div class="stamp" id="stamp">Rates as of<b>&mdash;</b></div>
+  </div>
+</header>
+
+<div class="msg err" id="err"></div>
+
+<nav role="tablist">
+  <button role="tab" id="t1" aria-selected="true" aria-controls="p1">Currency</button>
+  <button role="tab" id="t2" aria-selected="false" aria-controls="p2">Metal value</button>
+</nav>
+
+<!-- ============ TAB 1 ============ -->
+<section class="panel" id="p1" role="tabpanel" aria-labelledby="t1">
+  <span class="lbl">Type an amount in any box</span>
+  <div class="stack" id="stack"></div>
+</section>
+
+<!-- ============ TAB 2 ============ -->
+<section class="panel" id="p2" role="tabpanel" aria-labelledby="t2" hidden>
+  <div class="row">
+    <label class="field">
+      <span class="lbl">Weight (grams)</span>
+      <input type="number" id="grams" value="10" inputmode="decimal" step="any">
+    </label>
+    <label class="field">
+      <span class="lbl">Metal</span>
+      <select id="alloy"></select>
+    </label>
+  </div>
+
+  <span class="lbl" id="metalCaption">Value</span>
+  <div class="stack" id="metalStack"></div>
+
+  <div class="note">
+    Metal spot prices per gram.<br>
+    Scrap buyers typically pay 85&ndash;95% of this for gold, 70&ndash;85% for silver.
+  </div>
+</section>
+
+<div class="bar">
+  <button class="act" id="refresh">Update rates</button>
+</div>
+
+</div>
+
+<script>
+/* ==========================================================
+   1. PASTE YOUR TWO KEYS BETWEEN THE QUOTE MARKS BELOW
+   ========================================================== */
+
+const FX_KEY    = "0a0f32147248cc216dfb0efd";   // from exchangerate-api.com
+const METAL_KEY = "KTRDJYKOEUKJLQUHXWJK288UHXWJK";     // from metals.dev
+
+/* ==========================================================
+   2. Nothing below here needs editing.
+   ========================================================== */
+
+const GRAMS_PER_TROY_OZ = 31.1034768;
+
+const ALLOYS = [
+  { id:"ag925",  name:"Sterling silver", mark:"925",       metal:"silver",   purity:0.925 },
+  { id:"au375",  name:"9ct gold",        mark:"375",       metal:"gold",     purity:0.375 },
+  { id:"au585",  name:"14ct gold",       mark:"585",       metal:"gold",     purity:0.585 },
+  { id:"au750",  name:"18ct gold",       mark:"750",       metal:"gold",     purity:0.750 },
+  { id:"au916",  name:"22ct gold",       mark:"916",       metal:"gold",     purity:0.916 },
+  { id:"au999",  name:"24ct gold",       mark:"999",       metal:"gold",     purity:0.999 },
+  { id:"pt950",  name:"Platinum",        mark:"950",       metal:"platinum", purity:0.950 },
+];
+
+const CURRENCIES = ["ZAR","GBP","EUR","USD"];
+const SYM = { USD:"$", GBP:"£", EUR:"€", ZAR:"R" };
+
+let data = null;          // { fx:{GBP,EUR,USD}, spotUSD:{...}, at:ISO }
+let lastEdited = "GBP";
+
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+const money = (n, dp) => n.toLocaleString("en-ZA",{minimumFractionDigits:dp,maximumFractionDigits:dp});
+const dpFor = v => (Math.abs(v) < 10 && v !== 0) ? 4 : 2;
+
+function showError(msg){ const e=$("err"); e.textContent=msg; e.classList.add("on"); }
+function clearError(){ $("err").classList.remove("on"); }
+
+/* ---------- build tab 1: four editable boxes ---------- */
+function buildStack(){
+  $("stack").innerHTML = CURRENCIES.map(c => `
+    <div class="fxbox">
+      <div class="tag"><div class="code">${c}</div><div class="sym">${SYM[c]}</div></div>
+      <input type="number" id="fx_${c}" inputmode="decimal" step="any"
+             aria-label="Amount in ${c}" autocomplete="off">
+      <div class="rate" id="rate_${c}"></div>
+    </div>`).join("");
+
+  CURRENCIES.forEach(c => {
+    $("fx_"+c).addEventListener("input", () => { lastEdited = c; spread(c); });
+  });
+  $("fx_GBP").value = 100;
+}
+
+function spread(from){
+  if(!data) return;
+  const zarPer = Object.assign({ ZAR:1 }, data.fx);
+  const amt = parseFloat($("fx_"+from).value);
+
+  CURRENCIES.forEach(c => {
+    const unit = zarPer[from] / zarPer[c];
+    $("rate_"+c).textContent = (c === from) ? "" : `1 ${from} = ${SYM[c]}${unit.toFixed(4)}`;
+    if(c === from) return;
+    const v = amt * unit;
+    $("fx_"+c).value = isNaN(v) ? "" : v.toFixed(dpFor(v));
+  });
+}
+
+/* ---------- build tab 2: metal picker + read-only stack ---------- */
+function buildAlloys(){
+  $("alloy").innerHTML = ALLOYS
+    .map(a => `<option value="${a.id}">${a.name}</option>`).join("");
+  $("alloy").value = "au750";
+}
+
+function renderMetals(){
+  if(!data) return;
+  const a = ALLOYS.find(x => x.id === $("alloy").value);
+  const g = parseFloat($("grams").value);
+  const zarPer = Object.assign({ ZAR:1 }, data.fx);
+
+  // spot arrives per troy ounce in USD -> reduce to one pure gram, then apply purity
+  const perGramUSD = (data.spotUSD[a.metal] / GRAMS_PER_TROY_OZ) * a.purity;
+  const hasWeight = !isNaN(g) && g > 0;
+
+  $("metalCaption").textContent = hasWeight
+    ? `${a.name} · ${g} g`
+    : `${a.name} · price per gram`;
+
+  $("metalStack").innerHTML = CURRENCIES.map((c, i) => {
+    const perGram = perGramUSD * (zarPer.USD / zarPer[c]);
+    const total   = hasWeight ? perGram * g : perGram;
+    return `<div class="fxbox">
+        <div class="tag"><div class="code">${c}</div><div class="sym">${SYM[c]}</div></div>
+        <div class="val${i === 0 ? " lead" : ""}">${SYM[c]}${money(total, dpFor(total))}</div>
+        <div class="sub">${hasWeight ? `${SYM[c]}${money(perGram, dpFor(perGram))} per gram` : `${a.mark} · per gram`}</div>
+      </div>`;
+  }).join("");
+}
+
+/* ---------- fetching ---------- */
+async function fetchRates(){
+  const btn = $("refresh");
+  btn.disabled = true;
+  btn.textContent = "Updating…";
+  clearError();
+
+  try{
+    if(FX_KEY.startsWith("PASTE") || METAL_KEY.startsWith("PASTE"))
+      throw new Error("This file still has the placeholder keys in it. Open it in a text editor and paste your two keys near the bottom, where it says PASTE_YOUR.");
+
+    const [fxRes, mRes] = await Promise.all([
+      fetch(`https://v6.exchangerate-api.com/v6/${FX_KEY}/latest/ZAR`),
+      fetch(`https://api.metals.dev/v1/latest?api_key=${METAL_KEY}&currency=USD&unit=toz`)
+    ]);
+
+    if(!fxRes.ok) throw new Error("The currency service didn't answer. Check your exchangerate-api key, or try again in a moment.");
+    if(!mRes.ok)  throw new Error("The metals service didn't answer. You may have used up today's free calls — try again tomorrow, or check your metals.dev key.");
+
+    const fxJson = await fxRes.json();
+    const mJson  = await mRes.json();
+
+    if(fxJson.result === "error")
+      throw new Error("The currency service rejected the key. Generate a fresh one at exchangerate-api.com and paste it in.");
+    if(!mJson.metals)
+      throw new Error("The metals service rejected the key, or the free quota is used up for today.");
+
+    const r = fxJson.conversion_rates;   // ZAR -> X, so invert
+    data = {
+      fx: { GBP: 1/r.GBP, EUR: 1/r.EUR, USD: 1/r.USD },
+      spotUSD: { gold:mJson.metals.gold, silver:mJson.metals.silver, platinum:mJson.metals.platinum },
+      at: new Date().toISOString()
+    };
+
+    localStorage.setItem("benchrate", JSON.stringify(data));
+    render();
+  }catch(err){
+    showError(navigator.onLine
+      ? err.message
+      : "No connection, so the rates couldn't be updated. The saved rates above are still in use.");
+  }finally{
+    btn.disabled = false;
+    btn.textContent = "Update rates";
+  }
+}
+
+/* ---------- rendering ---------- */
+function render(){
+  if(!data) return;
+  const d = new Date(data.at);
+  const ageHrs = (Date.now() - d) / 36e5;
+  const st = $("stamp");
+  st.classList.toggle("stale", ageHrs > 24);
+  st.innerHTML = "Rates as of<b>" +
+    d.toLocaleString("en-ZA",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit",hour12:false}) +
+    "</b>";
+  spread(lastEdited);
+  renderMetals();
+}
+
+/* ---------- wiring ---------- */
+buildStack();
+buildAlloys();
+["grams","alloy"].forEach(id => $(id).addEventListener("input", renderMetals));
+$("refresh").addEventListener("click", fetchRates);
+
+document.querySelectorAll('[role=tab]').forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll('[role=tab]').forEach(t => {
+      const on = t === tab;
+      t.setAttribute("aria-selected", on);
+      $(t.getAttribute("aria-controls")).hidden = !on;
+    });
+  });
+});
+
+/* ---------- keep the app on the phone for offline use ---------- */
+if("serviceWorker" in navigator){
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  });
+}
+
+/* ---------- start: use saved rates, never fetch on its own ---------- */
+const cached = localStorage.getItem("benchrate");
+if(cached){
+  try{ data = JSON.parse(cached); render(); }catch(e){}
+}
+if(!data){
+  showError(navigator.onLine
+    ? "No rates saved yet. Press Update rates once to load them."
+    : "No rates saved yet, and there's no connection. Reconnect and press Update rates once.");
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" fill="#B8E4DC"/>
+  <g fill="none" stroke="#3D4A4B" stroke-width="13" stroke-linecap="round" stroke-linejoin="round">
+    <!-- balance beam -->
+    <line x1="136" y1="196" x2="376" y2="196"/>
+    <!-- centre column and foot -->
+    <line x1="256" y1="196" x2="256" y2="352"/>
+    <line x1="204" y1="356" x2="308" y2="356"/>
+    <path d="M232 352 h48"/>
+    <!-- hangers -->
+    <line x1="136" y1="196" x2="136" y2="228"/>
+    <line x1="376" y1="196" x2="376" y2="228"/>
+    <!-- pans -->
+    <path d="M92 228 h88 l-24 42 h-40 z"/>
+    <path d="M332 228 h88 l-24 42 h-40 z"/>
+  </g>
+  <!-- finial -->
+  <circle cx="256" cy="176" r="15" fill="#3D4A4B"/>
+</svg>
