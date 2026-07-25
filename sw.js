@@ -1,8 +1,8 @@
 /* Exchange Spot - offline cache.
    Bump CACHE_NAME whenever you upload a changed index.html,
-   e.g. "exchangespot-v3", so phones pick up the new version. */
+   e.g. "exchangespot-v5", so phones pick up the new version. */
 
-const CACHE_NAME = "exchangespot-v3";
+const CACHE_NAME = "exchangespot-v5";
 
 const SHELL = [
   "./",
