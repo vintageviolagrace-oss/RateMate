@@ -30,8 +30,21 @@
   --accent:#3D4A4B;
   --alert:#9C5A4A;
 }
+/* Vintage Viola Grace — dusty rose & gold, applied on the auction tab */
+body.rose{
+  --tiffany:#E6D0CE;
+  --tiffany-2:#DEC3C0;
+  --card:#EAD8D6;
+  --card-2:#E3CDCA;
+  --rule:#C9A7A3;
+  --ink:#6E5149;
+  --ink-soft:#8A6A61;
+  --muted:#A88A83;
+  --accent:#9C7B3F;   /* antique gold */
+  --alert:#9C5A4A;
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{background:var(--tiffany);color:var(--ink)}
+html,body{background:var(--tiffany);color:var(--ink);transition:background .35s ease}
 body{
   font-family:'Cormorant Garamond',Garamond,Georgia,serif;
   min-height:100vh;
@@ -119,6 +132,36 @@ label.field{display:block;margin-bottom:18px}
 }
 .note strong{color:var(--accent);font-weight:600}
 
+/* ---------- auction tab ---------- */
+.costrow{display:grid;grid-template-columns:1fr 96px;gap:11px;margin-bottom:11px}
+.curpick{font-size:16px;padding:13px 30px 13px 12px;background-position:calc(100% - 15px) 21px,calc(100% - 10px) 21px}
+.viewbar{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin:22px 0 14px;padding-top:18px;border-top:1px solid var(--rule);
+}
+.viewbar .curpick{width:130px;flex-shrink:0}
+.rescard{
+  background:var(--card);border:1px solid var(--rule);border-radius:2px;
+  padding:15px 16px;margin-bottom:10px;
+}
+.rescard.head{background:var(--card-2)}
+.rescard .rlbl{
+  font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:5px;
+}
+.rescard .rbig{font-size:29px;font-weight:600;color:var(--accent);letter-spacing:.01em;line-height:1.05}
+.rescard.head .rbig{font-weight:500}
+.rescard .rothers{
+  font-size:14px;color:var(--ink-soft);margin-top:7px;letter-spacing:.03em;
+}
+.rescard .rothers span{margin-right:14px;white-space:nowrap}
+.rescard.good{border-color:#6E9E7E;background:rgba(110,158,126,.12)}
+.rescard.good .rbig{color:#4A7A5A}
+.rescard.good .rbig::before{content:"+ "}
+.rescard.bad{border-color:#B4553C;background:rgba(180,85,60,.12)}
+.rescard.bad .rbig{color:#9C4A34}
+.rescard.bad .rbig::before{content:"\2212 "}
+
 /* ---------- refresh ---------- */
 .bar{display:flex;margin:26px 0 34px}
 button.act{
@@ -153,6 +196,7 @@ button.act:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 <nav role="tablist">
   <button role="tab" id="t1" aria-selected="true" aria-controls="p1">Currency</button>
   <button role="tab" id="t2" aria-selected="false" aria-controls="p2">Metal value</button>
+  <button role="tab" id="t3" aria-selected="false" aria-controls="p3">Auction friend</button>
 </nav>
 
 <!-- ============ TAB 1 ============ -->
@@ -180,6 +224,64 @@ button.act:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   <div class="note">
     Metal spot prices per gram.<br>
     Scrap buyers typically pay 85&ndash;95% of this for gold, 70&ndash;85% for silver.
+  </div>
+</section>
+
+<!-- ============ TAB 3 ============ -->
+<section class="panel" id="p3" role="tabpanel" aria-labelledby="t3" hidden>
+
+  <span class="lbl">The item</span>
+  <div class="row" style="margin-bottom:18px">
+    <label class="field" style="margin-bottom:0">
+      <span class="lbl">Weight (grams)</span>
+      <input type="number" id="a_grams" value="10" inputmode="decimal" step="any">
+    </label>
+    <label class="field" style="margin-bottom:0">
+      <span class="lbl">Metal</span>
+      <select id="a_alloy"></select>
+    </label>
+  </div>
+
+  <label class="field">
+    <span class="lbl">Auction commission %</span>
+    <input type="number" id="a_comm" value="20" inputmode="decimal" step="any">
+  </label>
+
+  <span class="lbl">Extra costs — leave blank if none</span>
+
+  <div class="costrow">
+    <input type="number" id="a_ship" placeholder="Shipping" inputmode="decimal" step="any">
+    <select id="a_shipCur" class="curpick"></select>
+  </div>
+  <div class="costrow">
+    <input type="number" id="a_cust" placeholder="Customs / duty" inputmode="decimal" step="any">
+    <select id="a_custCur" class="curpick"></select>
+  </div>
+
+  <span class="lbl" style="margin-top:6px">Your bid &amp; resale — leave blank to see max bid only</span>
+
+  <div class="costrow">
+    <input type="number" id="a_bid" placeholder="Your bid (hammer)" inputmode="decimal" step="any">
+    <select id="a_bidCur" class="curpick"></select>
+  </div>
+  <div class="costrow">
+    <input type="number" id="a_sell" placeholder="Estimated selling price" inputmode="decimal" step="any">
+    <select id="a_sellCur" class="curpick"></select>
+  </div>
+
+  <div class="viewbar">
+    <span class="lbl" style="margin:0">Show results in</span>
+    <select id="a_view" class="curpick"></select>
+  </div>
+
+  <div id="a_results"></div>
+
+  <div class="note">
+    <strong>Metal value</strong> is full melt worth at today's spot.<br>
+    <strong>Max bid (metal)</strong> is the highest hammer price where your bid plus commission still doesn't exceed the metal value.<br>
+    <strong>Max bid (all in)</strong> also takes shipping and customs out.<br>
+    A dash means the costs already exceed the metal.<br><br>
+    Enter <strong>your bid</strong> to see the true total you'd pay. Add an <strong>estimated selling price</strong> and it shows your profit and margin — green for profit, rose for a loss.
   </div>
 </section>
 
@@ -285,6 +387,91 @@ function renderMetals(){
   }).join("");
 }
 
+/* ---------- build tab 3: auction friend ---------- */
+function buildAuction(){
+  $("a_alloy").innerHTML = ALLOYS.map(a => `<option value="${a.id}">${a.name}</option>`).join("");
+  $("a_alloy").value = "au750";
+
+  const opts = CURRENCIES.map(c => `<option value="${c}">${c}</option>`).join("");
+  ["a_shipCur","a_custCur","a_bidCur","a_sellCur","a_view"].forEach(id => $(id).innerHTML = opts);
+  $("a_shipCur").value = "GBP";
+  $("a_custCur").value = "ZAR";
+  $("a_bidCur").value  = "GBP";
+  $("a_sellCur").value = "ZAR";
+  $("a_view").value    = "ZAR";
+
+  ["a_grams","a_alloy","a_comm","a_ship","a_shipCur","a_cust","a_custCur",
+   "a_bid","a_bidCur","a_sell","a_sellCur","a_view"]
+    .forEach(id => $(id).addEventListener("input", renderAuction));
+}
+
+function renderAuction(){
+  if(!data) return;
+  const zarPer = Object.assign({ ZAR:1 }, data.fx);
+  const a = ALLOYS.find(x => x.id === $("a_alloy").value);
+  const g = parseFloat($("a_grams").value);
+  const pct = parseFloat($("a_comm").value) || 0;
+
+  // costs: blank -> 0. Each converted from its own currency into ZAR.
+  const shipAmt = parseFloat($("a_ship").value);
+  const custAmt = parseFloat($("a_cust").value);
+  const shipZAR = isNaN(shipAmt) ? 0 : shipAmt * zarPer[$("a_shipCur").value];
+  const custZAR = isNaN(custAmt) ? 0 : custAmt * zarPer[$("a_custCur").value];
+
+  if(isNaN(g) || g <= 0){ $("a_results").innerHTML = ""; return; }
+
+  const metalValZAR = (data.spotUSD[a.metal] / GRAMS_PER_TROY_OZ) * a.purity * g * zarPer.USD;
+
+  // max hammer bid so bid + commission (+ costs) never exceeds metal value
+  const bidMetalZAR = metalValZAR / (1 + pct/100);
+  const bidAllZAR   = Math.max(0, (metalValZAR - shipZAR - custZAR) / (1 + pct/100));
+  const overCosts   = (metalValZAR - shipZAR - custZAR) <= 0;
+
+  const view = $("a_view").value;
+  const inView = zar => zar / zarPer[view];          // ZAR -> chosen currency
+  const others = CURRENCIES.filter(c => c !== view);
+
+  function card(lbl, zar, isHead, dash, tone){
+    const main = dash ? "&mdash;" : `${SYM[view]}${money(inView(zar))}`;
+    const sub  = dash ? "" :
+      `<div class="rothers">` +
+      others.map(c => `<span>${SYM[c]}${money(zar / zarPer[c])}</span>`).join("") +
+      `</div>`;
+    const cls = "rescard" + (isHead ? " head" : "") + (tone ? " " + tone : "");
+    return `<div class="${cls}">
+        <div class="rlbl">${lbl}</div>
+        <div class="rbig">${main}</div>${sub}
+      </div>`;
+  }
+
+  let html =
+    card(`Metal value · ${a.name} · ${g} g`, metalValZAR, true, false) +
+    card(`Max bid — metal only (${pct}% commission)`, bidMetalZAR, false, false) +
+    card(`Max bid — all in (commission, shipping, customs)`, bidAllZAR, false, overCosts);
+
+  // --- profit view: only when an actual bid is entered ---
+  const bidAmt  = parseFloat($("a_bid").value);
+  const sellAmt = parseFloat($("a_sell").value);
+
+  if(!isNaN(bidAmt) && bidAmt > 0){
+    const bidZAR   = bidAmt * zarPer[$("a_bidCur").value];
+    const totalZAR = bidZAR * (1 + pct/100) + shipZAR + custZAR;   // everything you pay
+    html += card(`Total you'd pay (bid + ${pct}% + shipping + customs)`, totalZAR, false, false);
+
+    if(!isNaN(sellAmt) && sellAmt > 0){
+      const sellZAR  = sellAmt * zarPer[$("a_sellCur").value];
+      const profitZAR = sellZAR - totalZAR;
+      const marginPct = sellZAR > 0 ? (profitZAR / sellZAR) * 100 : 0;
+      const lbl = profitZAR >= 0
+        ? `Profit at this bid · ${marginPct.toFixed(0)}% margin`
+        : `Loss at this bid`;
+      html += card(lbl, Math.abs(profitZAR), false, false, profitZAR >= 0 ? "good" : "bad");
+    }
+  }
+
+  $("a_results").innerHTML = html;
+}
+
 /* ---------- fetching ---------- */
 async function fetchRates(){
   const btn = $("refresh");
@@ -343,11 +530,13 @@ function render(){
     "</b>";
   spread(lastEdited);
   renderMetals();
+  renderAuction();
 }
 
 /* ---------- wiring ---------- */
 buildStack();
 buildAlloys();
+buildAuction();
 ["grams","alloy"].forEach(id => $(id).addEventListener("input", renderMetals));
 $("refresh").addEventListener("click", fetchRates);
 
@@ -358,6 +547,11 @@ document.querySelectorAll('[role=tab]').forEach(tab => {
       t.setAttribute("aria-selected", on);
       $(t.getAttribute("aria-controls")).hidden = !on;
     });
+    // dusty rose on the auction tab, tiffany elsewhere
+    const rose = tab.id === "t3";
+    document.body.classList.toggle("rose", rose);
+    document.querySelector('meta[name="theme-color"]')
+      .setAttribute("content", rose ? "#E6D0CE" : "#B8E4DC");
   });
 });
 
